@@ -22,7 +22,7 @@ def create_table():
     conn.close()
 
 # Getting Bill
-def fetch_data():
+def get_bill():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, category, amount, description FROM expenses")
@@ -30,7 +30,7 @@ def fetch_data():
     conn.close()
     return data
 
-# Add Kharcha
+# Add to cart
 def add_expense():
     # Fetch values directly from session state 
     cat = st.session_state.category_input
@@ -56,7 +56,6 @@ def add_expense():
     st.session_state.desc_input = ""
     st.balloons()
 
-    # st.success("Expense added successfully!")
 
 def reset_all():
     conn = get_connection()
@@ -64,14 +63,26 @@ def reset_all():
     cursor.execute("DELETE FROM expenses")
     conn.commit()
     conn.close()
-    # Clear session state
+    # Reset session state
     st.session_state.category_input = "Food"
     st.session_state.amount_input = 0.0
     st.session_state.desc_input = ""
     st.balloons()
 
-# Expense 
+    
+
+# main function 
 def show():
+    # check account login
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
+
+    if not st.session_state.logged_in:
+        st.title("🔒 Login Required")
+        st.warning("Please login or create account to continue")
+        st.stop() 
+
+    # expense tracking begins
     st.set_page_config(page_title="Expense Tracker", layout="centered")
     st.title("Personal Expense Tracker")
     create_table()
@@ -82,13 +93,15 @@ def show():
         ["Food", "Entertainment", "Travel", "Fuel", "Electronics", "Miscellaneous"],
         key="category_input"
     )
-    st.number_input("Amount", min_value=0.0, step=10.0, key="amount_input")
+    st.number_input("Amount", min_value=0.0, step=100.0, key="amount_input")
+
     st.text_area("Description", placeholder="What was this for?", key="desc_input")
 
     # Buttons
     col1, col2 = st.columns(2)
     with col1:
         st.button("Add Expense", width="stretch", on_click=add_expense, type="primary")
+
     with col2:
         st.button("Reset All Data", width="stretch", on_click=reset_all)
 
