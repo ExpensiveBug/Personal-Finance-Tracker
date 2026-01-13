@@ -6,7 +6,21 @@ from streamlit_option_menu import option_menu
 st.markdown("""
 <style>
         .stApp{
-            background-color : #7088f5;}
+            background-color : #7088f5;
+            }
+        /* Hide Streamlit Branding */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+            
+        .stButton>button {
+        width: 100%;
+        border-radius: 14px;
+        color: white;
+        font-weight: 600;
+        padding: 12px 24px;
+        background-color : #0437F2;
+        }
 </style>""", unsafe_allow_html=True)
 
 st.markdown("<h1 style = 'text-align:center;'> $pent count</h1>",unsafe_allow_html=True)
@@ -31,8 +45,8 @@ selected = option_menu(
 )
 # pages
 if selected =="Account":
-    import pages.account as p
-    p.show()
+    import pages.account as a
+    a.show()
 
 elif selected == "Expense":
     import pages.expense as ep
@@ -45,3 +59,4 @@ elif selected == "Income":
 elif selected == "Report":
     import pages.report as rep
     rep.show()
+
