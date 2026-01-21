@@ -5,6 +5,10 @@ from streamlit_option_menu import option_menu
 # app Background
 st.markdown("""
 <style>
+        # remove sidebar
+        [data-testid="stSidebar"] {
+                display: none;
+            }
         .stApp{
             background-color : #7088f5;
             }
@@ -59,4 +63,5 @@ elif selected == "Income":
 elif selected == "Report":
     import pages.report as rep
     rep.show()
+
 
