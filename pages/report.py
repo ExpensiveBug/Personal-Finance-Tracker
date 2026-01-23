@@ -18,18 +18,15 @@ def show():
     total_earn = 0
     total_bill = 0
     c1,c2 = st.columns(2)
-    # Bill
     with c1 : 
         st.header("Bill Report")
         bill_data = get_bill()
         if bill_data:
             df = pd.DataFrame(bill_data, columns=["ID", "Category", "Amount", "Description"])
-            df = df.drop(columns=["ID"])
-            st.matric(df, border = "horizontal")
-            
+            st.dataframe(df.drop(columns=["ID"]), width="content")
             
             total_bill = df["Amount"].sum()
-            st.metric("Total Expenses", f"₹{total_bill:,.2f}", border=True)
+            st.text(f"Total Expenses ₹{total_bill:,.2f}")
 
             fig, ax = plt.subplots(figsize = (8,5))
             bars = ax.bar(df["Category"], df["Amount"], width=0.3, color = ['blue', 'red', 'orange'])
@@ -39,7 +36,7 @@ def show():
 
         else:
             st.info("No expenses recorded yet.")      
-    # Income
+    
     with c2 : 
         st.header("Income Report")
         earn_data = get_income()
@@ -48,7 +45,7 @@ def show():
             st.dataframe(df2.drop(columns=["ID"]), width="content")
 
             total_earn = df2["Income"].sum()
-            st.metric("Total Income", f"₹{total_earn:,.2f}", border = True)
+            st.text(f"Total Income ₹{total_earn:,.2f}")
 
             fig,ax = plt.subplots(figsize=(8,5))
             bars = ax.bar(df2["Income_type"], df2["Income"],  width = 0.3, color = ["#63B0F3","#394FE0","#3B2EF2"])
@@ -59,10 +56,10 @@ def show():
         else : 
             st.info("No Income recorded yet.")
 
-# Wallet condition
+
     if total_bill and total_earn:
         acc = total_earn-total_bill
-        st.metric("Account Condition : ",f"₹{acc:,.2f}",border = True)
+        st.text(f"📊 Account Condition: ₹{acc:,.2f}")
     elif total_earn :
         acc = total_earn
-        st.metric("Account Condition : ",f"₹{acc:,.2f}", border = True)        
+        st.text(f"📊 Account Condition: ₹{acc:,.2f}")
