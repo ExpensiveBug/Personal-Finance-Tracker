@@ -1,5 +1,4 @@
 import streamlit as st
-import sqlite3 
 import database as db
 
 
@@ -89,4 +88,5 @@ if __name__ == "__main__":
         st.session_state.note_input = ""
     
     show()
+
 
