@@ -1,11 +1,10 @@
 import streamlit as st
 import sqlite3 
+import database as db
 
-def get_connection():
-    return sqlite3.connect("Earning.db",check_same_thread=False)
 
 def create_income():
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS earnings ( 
@@ -18,7 +17,7 @@ def create_income():
     conn.close()
 
 def get_income():
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("""Select id, source, amount, note from earnings""")
     data = cursor.fetchall()
@@ -26,7 +25,7 @@ def get_income():
     return data
 
 def reset_income():
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM earnings")
     conn.commit()
@@ -45,7 +44,7 @@ def add_income():
         st.error("Amount must be greater than zero!!")
         return
     
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO earnings (source, amount, note) VALUES (?, ?, ?)",
                    (sal_type, amt, desc))
@@ -90,3 +89,4 @@ if __name__ == "__main__":
         st.session_state.note_input = ""
     
     show()
+
