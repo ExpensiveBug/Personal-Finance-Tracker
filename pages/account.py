@@ -1,12 +1,9 @@
 import streamlit as st
-import sqlite3
+import database as db
 import bcrypt
 
-def get_connection():
-    return sqlite3.connect("account.db", check_same_thread=False)
-
 def users_table():
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS users_record(
                    id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,7 +15,7 @@ def users_table():
     conn.close()
 
 def create_user(username, password, mail):
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     # check if user already exist
     cursor.execute("Select 1 FROM users_record WHERE username = ? and email = ?",
@@ -34,7 +31,7 @@ def create_user(username, password, mail):
     return True
 
 def user_verify(user, password):
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, username, password, email FROM users_record WHERE username = ?",
                    (user,)  )
@@ -115,4 +112,5 @@ def show():
 
             else : 
                 st.error("Username or email already exist !!")
+
 
