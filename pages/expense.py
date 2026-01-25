@@ -1,14 +1,10 @@
 import streamlit as st
-import sqlite3
+import database as db
 import pandas as pd
-
-# Database connection
-def get_connection():
-    return sqlite3.connect("expense.db", check_same_thread=False)
 
 # Create Bill 
 def create_table():
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS expenses(
@@ -23,7 +19,7 @@ def create_table():
 
 # Getting Bill
 def get_bill():
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, category, amount, description FROM expenses")
     data = cursor.fetchall()
@@ -41,7 +37,7 @@ def add_expense():
         st.error("Amount must be greater than 0!")
         return
 
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO expenses (category, amount, description) VALUES (?, ?, ?)",
@@ -58,7 +54,7 @@ def add_expense():
 
 
 def reset_all():
-    conn = get_connection()
+    conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM expenses")
     conn.commit()
@@ -115,3 +111,4 @@ if __name__ == "__main__":
         st.session_state.desc_input = ""
 
     show()
+
