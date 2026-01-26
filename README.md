@@ -1,48 +1,60 @@
 # Personal-Finance-Tracker
 
 ### Description 
-This is a user-friendly Streamlit personal finance tracker app that help user's to manage their money easily. User can add, edit, or delete income and spending transactions. The app tracks user finances and generates detailed reports with clear insights into user spending habits, helping user to understand where his/her money goes and make better financial decisions.
+This is a user-friendly Streamlit personal finance tracker app that help user to manage their money easily. User can add, edit, or delete income and spending transactions. The app tracks user finances and generates detailed reports with clear insights into user spending habits, helping user to understand where their money goes and make better financial decisions.
+
+## Installation
+pip install -r requirements.txt
+
+## Run the App
+streamlit run start.py
 
 ### Features
-- [Go to User Account](#User Account(Login/ sign up))
-- [Go to Expense Tracking](#Expense Tracking)
-- [Go to Income Management](#Income Management)
-- [Go to Visual Reports](#Visual Reports)
-- [Go to Secure password handling](#Secure Password handling (bcrypt))
+- [User Account](#user-account)
+- [Go to Expense Tracking](#Expense-Tracking)
+- [Go to Income Management](#Income-Management)
+- [Go to Visual Reports](#Visual-Reports)
+- [Go to Secure password handling](#Secure-Password-handling)
 
-## User Account(Login/ Sign Up :
+## User Account :
 <img width="927" height="267" alt="image" src="https://github.com/user-attachments/assets/cc3d5096-7b1f-4944-8a39-6c700ff9f2f4" />
 Here, we can create a new account by clicking the sign up button and login to already existing account
 Without an account we cannot move forward to use the app
 
 ## Expense Tracking
-```st.selectbox(
-        "Select the type of expense",
-        ["Food", "Entertainment", "Travel", "Fuel", "Electronics", "Miscellaneous"],
-        key="category_input"
-    )
-    st.number_input("Amount", min_value=0.0, step=100.0, key="amount_input")
+The app allows users to record their expenses effortlessly. Users can:
 
-    st.text_area("Description", placeholder="What was this for?", key="desc_input")
-```
-we track the expense by selecting the given option and adding the amount we have spent on it, also we can add description about the expense.
+- Choose the type of expense (e.g., Food, Travel, Entertainment, Electronics, Miscellaneous)
+- Enter the amount spent
+- Add a short description to keep track of what the expense was for
+- Edit or delete previous entries
+
+This helps users monitor their spending habits and identify areas where they can save money.
+
+**Example:**  
+_A user spends $50 on groceries and adds a note: “Weekly groceries at SuperMart.”_
 
 ## Income Management
-```st.header("Income Tracker")
+Users can also track all sources of income. The app allows:
 
-    st.selectbox("Select income type ",["Job","Business","Asset","Interest","Other"], key = "income_type")
-    st.number_input("Amount ",min_value = 0.0, step = 100.0, key = "amount_input")
-    st.text_area("Description",placeholder="Note about your income...", key = "note_input")
+- Selecting income type (Job, Business, Assets, Interest, Other)
+- Adding the income amount
+- Writing a short note for context (e.g., “Freelance project payment”)
+- Viewing and updating previous income records
 
-    st.button("Add Income",width="stretch", on_click=add_income)
-    st.button("Reset",width="stretch", on_click= reset_income)
-```
-Here we insert our income and source of that income and also we can add some Note about the income. 
+This helps users compare their income vs expenses and see their net balance over time.
 
 ## Visual Reports
-// image
-Here we see the expenses bills report that were added earlier and also the income report.
-then we calculate our account situation whether it's in lose or still have some positive amount.
+<img width="1265" height="923" alt="image" src="https://github.com/user-attachments/assets/f0deadfd-ddcb-4b9b-be1a-76bb03f5989e" />
+The Visual Reports section displays a summary of all recorded expenses and income.
+The app calculates the net balance to determine whether the user is in a loss or profit.
 
-## Secure Password handling (bcrypt)
-code
+## Secure Password handling 
+Passwords are hashed using bcrypt to ensure secure storage:
+```python
+hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+```
+Password will be verified with : 
+```python
+  bcrypt.checkpw(entered_password.encode(), stored_hashed_pw)
+```
