@@ -2,36 +2,13 @@ import streamlit as st
 import database as db
 import pandas as pd
 
-# Create Bill 
-def create_table():
-    conn = db.get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS expenses(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT,
-            amount REAL,
-            description TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-# Getting Bill
-def get_bill():
-    conn = db.get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, category, amount, description FROM expenses")
-    data = cursor.fetchall()
-    conn.close()
-    return data
-
 # Add to cart
 def add_expense():
     # Fetch values directly from session state 
     cat = st.session_state.category_input
     amt = st.session_state.amount_input
     desc = st.session_state.desc_input
+    user_id = st.session_state.user_id
 
     if amt <= 0:
         st.error("Amount must be greater than 0!")
@@ -40,8 +17,8 @@ def add_expense():
     conn = db.get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO expenses (category, amount, description) VALUES (?, ?, ?)",
-        (cat, amt, desc)
+        "INSERT INTO expenses (user_id, category, amount, description) VALUES (?, ?, ?, ?)",
+        (st.session_state.user_id, cat, amt, desc)
     )
     conn.commit()
     conn.close()
@@ -56,7 +33,7 @@ def add_expense():
 def reset_all():
     conn = db.get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM expenses")
+    cursor.execute("DELETE FROM expenses WHERE user_id = ?",(st.session_state.user_id,))
     conn.commit()
     conn.close()
     # Reset session state
@@ -70,18 +47,15 @@ def reset_all():
 # main function 
 def show():
     # check account login
-    if "logged_in" not in st.session_state:
-        st.session_state.logged_in = False
-
     if not st.session_state.logged_in:
         st.title("🔒 Login Required")
-        st.warning("Please login or create account to continue")
+        st.warning("Please login or create account to continue !!")
         st.stop() 
 
     # expense tracking begins
     st.set_page_config(page_title="Expense Tracker", layout="centered")
     st.title("Personal Expense Tracker")
-    create_table()
+    db.create_bill_table()
 
     # Form Inputes
     st.selectbox(
@@ -111,4 +85,5 @@ if __name__ == "__main__":
         st.session_state.desc_input = ""
 
     show()
+
 
