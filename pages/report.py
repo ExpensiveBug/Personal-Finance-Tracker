@@ -1,26 +1,27 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from pages.expense import get_bill             # to look expense.py in same folder
-from pages.income import get_income
+import database as db
 
 def show():
     # account login check
-    if "logged_in" not in st.session_state:
-        st.session_state.logged_in = False
-
     if not st.session_state.logged_in:
         st.title("🔒 Login Required")
         st.warning("Please login or create account to continue")
         st.stop() 
 
+    user_id = st.session_state.user_id
+
     # reporting begins 
     total_earn = 0
     total_bill = 0
+    df = pd.DataFrame()
+    df2 = pd.DataFrame()
+    
     c1,c2 = st.columns(2)
     with c1 : 
         st.header("Bill Report")
-        bill_data = get_bill()
+        bill_data = db.get_bill(user_id)
         if bill_data:
             df = pd.DataFrame(bill_data, columns=["ID", "Category", "Amount", "Description"])
             st.dataframe(df.drop(columns=["ID"]), width="content")
@@ -39,7 +40,7 @@ def show():
     
     with c2 : 
         st.header("Income Report")
-        earn_data = get_income()
+        earn_data = db.get_income(user_id)
         if earn_data :
             df2 = pd.DataFrame(earn_data, columns=["ID","Income_type", "Income", "Note"])
             st.dataframe(df2.drop(columns=["ID"]), width="content")
@@ -57,9 +58,45 @@ def show():
             st.info("No Income recorded yet.")
 
 
-    if total_bill and total_earn:
-        acc = total_earn-total_bill
-        st.text(f"📊 Account Condition: ₹{acc:,.2f}")
-    elif total_earn :
-        acc = total_earn
-        st.text(f"📊 Account Condition: ₹{acc:,.2f}")
+    # Now Account
+    if total_earn > total_bill :
+        acc = total_earn - total_bill
+        st.text(f"Account Condition: ₹{acc:,.2f}")
+        st.success("Account is in Profit ")
+
+    elif total_earn < total_bill:
+        acc = total_bill - total_earn
+        st.text(f"Account Condition: ₹{acc:,.2f}")
+        st.warning("Account is in loss ")
+
+    else :
+        acc = 0
+        st.text(f"Account Condition: ₹0.00")
+        st.info("No Profit No loss ")
+
+    # creating report
+    expense_df = pd.DataFrame()
+    if not df.empty:
+        # rename columns for normalization
+        expense_df = df.copy()
+        expense_df["Type"] = "Expense"
+        expense_df = expense_df.reindex(columns=["Type","Category","Amount","Description"])
+
+    income_df = pd.DataFrame()
+    if not df2.empty:
+        income_df = df2.rename(columns={
+            "Income_type": "Category",
+            "Income": "Amount",
+            "Note": "Description"
+        })
+        income_df["Type"] = "Income"
+        income_df = income_df.reindex(columns=["Type","Category","Amount","Description"])
+
+    report_df = pd.concat([expense_df, income_df], ignore_index= True)
+
+    if report_df.empty:
+        st.info("No Data available to Download!!")
+    else :
+        report = report_df.to_csv(index=False)
+        # Download file
+        st.download_button(label="Download Report", data = report, file_name="Account_Report.csv",mime = "text/csv")  
