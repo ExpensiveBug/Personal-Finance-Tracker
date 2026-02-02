@@ -2,31 +2,10 @@ import streamlit as st
 import database as db
 
 
-def create_income():
-    conn = db.get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS earnings ( 
-                   id INTEGER PRIMARY KEY AUTOINCREMENT,
-                   source Text,
-                   amount Real,
-                   note Text)
-                   """)
-    conn.commit()
-    conn.close()
-
-def get_income():
-    conn = db.get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""Select id, source, amount, note from earnings""")
-    data = cursor.fetchall()
-    conn.commit()
-    return data
-
 def reset_income():
     conn = db.get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM earnings")
+    cursor.execute("DELETE FROM earnings WHERE user_id = ?"(st.session_state.user_id,))
     conn.commit()
     conn.close()
     # reset interface
@@ -38,6 +17,8 @@ def add_income():
     sal_type = st.session_state.income_type
     amt = st.session_state.amount_input
     desc = st.session_state.note_input
+    user_id = st.session_state.user_id
+
 
     if(amt <= 0):
         st.error("Amount must be greater than zero!!")
@@ -45,8 +26,8 @@ def add_income():
     
     conn = db.get_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO earnings (source, amount, note) VALUES (?, ?, ?)",
-                   (sal_type, amt, desc))
+    cursor.execute("INSERT INTO earnings (user_id, source, amount, note) VALUES (?, ?, ?, ?)",
+                   (st.session_state.user_id, sal_type, amt, desc))   
     conn.commit()
     conn.close()
     st.balloons()
@@ -57,17 +38,14 @@ def add_income():
 
 def show():
     # check account login
-    if "logged_in" not in st.session_state:
-        st.session_state.logged_in = False
-
     if not st.session_state.logged_in:
         st.title("🔒 Login Required")
-        st.warning("Please login or create account to continue")
+        st.warning("Please login or create account to continue!!")
         st.stop() 
 
     # Income tracking begins
     st.set_page_config(page_title="Income Tracker", layout="centered")
-    create_income()
+    db.create_income_table()
 
     st.header("Income Tracker")
 
@@ -88,5 +66,6 @@ if __name__ == "__main__":
         st.session_state.note_input = ""
     
     show()
+
 
 
